@@ -28,7 +28,6 @@ public class BaseStore<S> implements Store<S> {
     private final List<Subscriber<S>> subscribers = new CopyOnWriteArrayList<Subscriber<S>>();
 
     public BaseStore(S initialState, Reducer<S> reducer) {
-        isDispatching.set(false);
         currentState.set(initialState);
         this.reducer = reducer;
     }
