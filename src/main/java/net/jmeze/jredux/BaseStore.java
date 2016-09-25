@@ -2,6 +2,7 @@ package net.jmeze.jredux;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class BaseStore<S> implements Store<S> {
 
@@ -22,19 +23,19 @@ public class BaseStore<S> implements Store<S> {
                 }
             };
 
-    private S currentState;
+    private final AtomicReference<S> currentState = new AtomicReference<S>();
     private final Reducer<S> reducer;
     private final List<Subscriber<S>> subscribers = new CopyOnWriteArrayList<Subscriber<S>>();
 
     public BaseStore(S initialState, Reducer<S> reducer) {
         isDispatching.set(false);
-        currentState = initialState;
+        currentState.set(initialState);
         this.reducer = reducer;
     }
 
     @Override
-    public synchronized S getState() {
-        return currentState;
+    public S getState() {
+        return currentState.get();
     }
 
     @Override
@@ -60,7 +61,7 @@ public class BaseStore<S> implements Store<S> {
         // thread at a time updates the currentState
         synchronized (this) {
             isDispatching.set(true);
-            currentState = reducer.reduce(currentState, action);
+            currentState.set(reducer.reduce(currentState.get(), action));
             isDispatching.set(false);
         }
 
@@ -71,7 +72,7 @@ public class BaseStore<S> implements Store<S> {
         // report the latest state to subscribers, but as we popped up the stack and the earlier calls continued they
         // would report earlier state to the subscribers
         for (Subscriber subscriber : subscribers) {
-            subscriber.onStateChange(currentState);
+            subscriber.onStateChange(currentState.get());
         }
 
     }
