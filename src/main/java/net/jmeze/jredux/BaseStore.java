@@ -28,8 +28,14 @@ public class BaseStore<S> implements Store<S> {
     private final List<Subscriber<S>> subscribers = new CopyOnWriteArrayList<Subscriber<S>>();
 
     public BaseStore(S initialState, Reducer<S> reducer) {
+
+        if (reducer == null) {
+            throw new IllegalArgumentException("BaseStore must not have null reducer");
+        }
+
         currentState.set(initialState);
         this.reducer = reducer;
+
     }
 
     @Override
@@ -52,6 +58,9 @@ public class BaseStore<S> implements Store<S> {
         // So when would multithreaded dispatch be useful? perhaps your state structure contains unrelated sections.
         // these could be safely updated by separate threads.
 
+        // it's non-trival to get here as the reducer itself cannot have a reference to baseState object because
+        // baseState requires reducer object first.  However, a reducer could in theory use some kind of object lookup
+        // to find baseStore after construction and call dispatch
         if (isDispatching.get()) {
             throw new IllegalStateException("Reducers may not dispatch actions");
         }
