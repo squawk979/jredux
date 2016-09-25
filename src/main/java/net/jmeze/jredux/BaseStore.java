@@ -56,20 +56,22 @@ public class BaseStore<S> implements Store<S> {
             throw new IllegalStateException("Reducers may not dispatch actions");
         }
 
-        S state;
-
         // dispatch could be called by multiple threads at the same time, the synchronized block ensures only a single
         // thread at a time updates the currentState
         synchronized (this) {
             isDispatching.set(true);
             currentState = reducer.reduce(currentState, action);
             isDispatching.set(false);
-            state = currentState;
         }
 
         // the notify subscribers loop is outside the synchronized block to allow for nested dispatch
+        // note we pass the currentState which can potentially change (by other threads) as we go through the loop
+        // in the earlier implementation I stored the state so the same state could be given to all subscribers,
+        // but now realise that would create problems with nested dispatch calls: the deepest nested call would
+        // report the latest state to subscribers, but as we popped up the stack and the earlier calls continued they
+        // would report earlier state to the subscribers
         for (Subscriber subscriber : subscribers) {
-            subscriber.onStateChange(state);
+            subscriber.onStateChange(currentState);
         }
 
     }
