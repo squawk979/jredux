@@ -1,18 +1,25 @@
 # jredux
 
-A very simple Java (8+) take on Redux.
+** NOTE: this library is completely untested - I've not yet even compiled the code! **
 
-Thread safe use of this library requires immutable objects to be used for state and also requires thread safe reducers.
+A very simple Java (6+) take on Redux.
 
-The Java Immutables library https://immutables.github.io/ is a recommended starting point.
+Consider this library experimental.  Originally ripped from https://github.com/brianegan/bansa.
+
+Thread safe use of this library requires immutable* state objects and also requires pure reducers.  The order of action
+dispatch can only be guaranteed if called from the same thread.  Do not dispatch actions that update the
+same part of the state structure from different threads as the order in which the actions are applied cannot be guaranteed.
+If you do call dispatch from different threads ensure that these actions (and any listener actions they may trigger) do
+not update the same part of the state.  You're almost certainly better off just having a one thread call dispatch.
+
+Redux basics: http://redux.js.org/docs/basics/
+
+The Java Immutables library https://immutables.github.io/ is recommended.
 
 Utils.combineReducers is used to combine multiple reducers into a single reducer that can be passed to constructor.
-
-If immutable state objects were not used we would have to deep copy (clone) state objects - something we do not wish to do.
 
 We did consider using https://github.com/MutabilityDetector/MutabilityDetector to runtime check the immutability
 of the state object, but decided against the overhead.  We do however recommend annotating immutable classes and
 using the associated findbugs plugin.  See https://stackoverflow.com/questions/37087809/how-to-find-out-if-a-class-is-immutable
 
-Consider this library experimental.  The interfaces have been ripped from https://github.com/brianegan/bansa.  The
-implementation has been simplified and thread safety improved.
+* by using immutable objects we avoid the need to deep copy (clone) state objects

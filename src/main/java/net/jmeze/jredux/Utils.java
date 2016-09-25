@@ -1,7 +1,6 @@
 package net.jmeze.jredux;
 
 public class Utils {
-    @SafeVarargs
     public static <S> Reducer<S> combineReducers(final Reducer<S>... reducers) {
         return new Reducer<S>() {
             @Override
