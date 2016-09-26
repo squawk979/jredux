@@ -1,8 +1,6 @@
 # jredux
 
-** NOTE: this library is completely untested - I've not yet even compiled the code! **
-
-A very simple Java (6+) take on Redux.
+A very simple Java take on Redux.
 
 Consider this library experimental.  Originally ripped from https://github.com/brianegan/bansa.
 
