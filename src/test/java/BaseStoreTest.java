@@ -4,6 +4,7 @@ import net.jmeze.jredux.Reducer;
 import net.jmeze.jredux.Subscriber;
 import org.junit.Before;
 import org.junit.Test;
+import org.omg.SendingContext.RunTime;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -114,6 +115,33 @@ public class BaseStoreTest {
         baseStore.dispatch(new Action() {
             // empty action
         });
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void donNotCatchRuntimeExceptionInReducer() {
+
+        BaseStore<Integer> baseStore = new BaseStore<Integer>(null, new Reducer<Integer>() {
+            @Override
+            public Integer reduce(Integer state, Action action) {
+                throw new RuntimeException();
+            }
+        });
+
+        try {
+            baseStore.dispatch(new Action() {
+                // empty action
+            });
+        } catch (Throwable e) {
+            // let's assume we somehow fix the problem
+        }
+
+        // second call to dispatch
+        baseStore.dispatch(new Action(){
+            // empty action
+        });
+
+        assertNull(baseStore.getState());
 
     }
 

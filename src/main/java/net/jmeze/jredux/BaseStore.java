@@ -58,7 +58,7 @@ public class BaseStore<S> implements Store<S> {
         // So when would multithreaded dispatch be useful? perhaps your state structure contains unrelated sections.
         // these could be safely updated by separate threads.
 
-        // it's non-trival to get here as the reducer itself cannot have a reference to baseState object because
+        // it's non-trivial to get here as the reducer itself cannot have a reference to baseState object because
         // baseState requires reducer object first.  However, a reducer could in theory use some kind of object lookup
         // to find baseStore after construction and call dispatch
         if (isDispatching.get()) {
@@ -69,8 +69,13 @@ public class BaseStore<S> implements Store<S> {
         // thread at a time updates the currentState
         synchronized (this) {
             isDispatching.set(true);
-            currentState.set(reducer.reduce(currentState.get(), action));
-            isDispatching.set(false);
+            try {
+                currentState.set(reducer.reduce(currentState.get(), action));
+            } finally {
+                // use finally clause as the above reduce() could throw a RuntimeException or Error.  The client
+                // may handle these and then call dispatch again, so we need to ensure the dispatch flag is reset
+                isDispatching.set(false);
+            }
         }
 
         // the notify subscribers loop is outside the synchronized block to allow for nested dispatch
@@ -80,6 +85,9 @@ public class BaseStore<S> implements Store<S> {
         // report the latest state to subscribers, but as we popped up the stack and the earlier calls continued they
         // would report earlier state to the subscribers
         for (Subscriber subscriber : subscribers) {
+            // note onStateChange could throw a RuntimeException or Error.  It's debatable what to do in this
+            // circumstance, we could swallow the exception so rest of the subscribers onStateChange methods are called,
+            // but then the client would never be aware of the problem, hence we don't to catch
             subscriber.onStateChange(currentState.get());
         }
 
