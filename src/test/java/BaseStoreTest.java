@@ -1,16 +1,16 @@
-import net.jmeze.jredux.Action;
-import net.jmeze.jredux.BaseStore;
-import net.jmeze.jredux.Reducer;
-import net.jmeze.jredux.Subscriber;
-import org.junit.Before;
-import org.junit.Test;
-import org.omg.SendingContext.RunTime;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNull;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNull;
+import org.junit.Before;
+import org.junit.Test;
+
+import net.jmeze.jredux.Action;
+import net.jmeze.jredux.BaseStore;
+import net.jmeze.jredux.Reducer;
+import net.jmeze.jredux.Subscriber;
 
 public class BaseStoreTest {
 
