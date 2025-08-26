@@ -6,7 +6,12 @@
 
     <groupId>net.jmeze</groupId>
     <artifactId>jredux</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
+
+    <properties>
+        <!-- JDK 20's javac compiler has removed support for compiling code targeting Java 7, so we bump to Java 8 -->
+        <maven.compiler.release>8</maven.compiler.release>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -21,10 +26,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
+                <version>3.14.0</version>
             </plugin>
         </plugins>
     </build>
